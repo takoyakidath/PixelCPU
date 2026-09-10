@@ -1,6 +1,9 @@
 // Plain-language Japanese narration for each micro-op event, so a CPU
 // newcomer can follow what just happened without reading raw event
-// objects. Wording adapted from docs/codex-drafts/explain-templates.md.
+// objects. Wording adapted from docs/codex-drafts/explain-templates.md,
+// with short glossary hints on first-glance jargon (MAR, ALU, operand...)
+// since a beginner won't yet know what those abbreviations mean even
+// though the words themselves are Japanese.
 
 function hex8(value) {
   return `0x${(value & 0xff).toString(16).padStart(2, "0").toUpperCase()}`;
@@ -8,10 +11,25 @@ function hex8(value) {
 
 const BUS_LABEL = { address: "アドレス", data: "データ" };
 
+// Friendlier label for component ids that show up as bus-transfer
+// endpoints. Registers (A-D, PC, SP) are left as-is since their meaning
+// is already spelled out via the diagram tooltips and register table.
+const FRIENDLY_NAME = {
+  MAR: "MAR(アクセス先の番地を覚える場所)",
+  ALU: "ALU(計算する部品)",
+  RAM: "RAM(メモリ)",
+  IR: "IR(命令を覚える場所)",
+  operand: "命令の続きのデータ",
+};
+
+function name(id) {
+  return FRIENDLY_NAME[id] || id;
+}
+
 export function explain(event) {
   switch (event.type) {
     case "bus-transfer":
-      return `${event.from}から${event.to}へ、値${hex8(event.value)}が${BUS_LABEL[event.bus] || ""}バスを通って送られました。`;
+      return `${name(event.from)}から${name(event.to)}へ、値${hex8(event.value)}が${BUS_LABEL[event.bus] || ""}バス(${event.bus === "address" ? "番地を伝える経路" : "データを伝える経路"})を通って送られました。`;
     case "alu-op":
       return event.b === undefined
         ? `計算を担当するALUが${event.a}に${event.op}演算を行い、結果${event.result}を得ました。`

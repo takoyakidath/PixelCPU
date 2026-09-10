@@ -11,11 +11,11 @@
       <header class="app-header">
         <h1>PixelCPU</h1>
         <div class="pipeline-indicator" id="pipeline-indicator">
-          <span class="pipeline-stage" data-phase="FETCH">FETCH</span>
-          <span class="pipeline-stage" data-phase="DECODE">DECODE</span>
-          <span class="pipeline-stage" data-phase="EXECUTE">EXECUTE</span>
+          <span class="pipeline-stage" data-phase="FETCH" title="フェッチ：RAMから次の命令をIRへ読み込む段階">FETCH</span>
+          <span class="pipeline-stage" data-phase="DECODE" title="デコード：読み込んだ命令が何をする命令かを解読する段階">DECODE</span>
+          <span class="pipeline-stage" data-phase="EXECUTE" title="エグゼキュート：解読した内容を実際に実行する段階">EXECUTE</span>
         </div>
-        <div class="debugger-controls">
+        <div class="debugger-controls" id="debugger-controls">
           <button id="btn-run" type="button">▶ Run</button>
           <button id="btn-pause" type="button">⏸ Pause</button>
           <button id="btn-step-clock" type="button">1クロック</button>
@@ -85,6 +85,8 @@
         </div>
       </div>
     </div>
+
+    <div id="toast-root" class="toast-root" aria-live="polite"></div>
 
     <script type="module" src="/src/main.js"></script>
   </body>

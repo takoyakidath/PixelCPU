@@ -11,6 +11,7 @@ import { Editor } from "./ui/panels/editor.js";
 import { explain } from "./ui/panels/explain.js";
 import { StatsPanel } from "./ui/panels/statsPanel.js";
 import { StatsCollector } from "./simulator/statsCollector.js";
+import { ToastBar } from "./ui/panels/toast.js";
 
 import sample1 from "./samples/01-sum-1-to-10.asm?raw";
 import sample2 from "./samples/02-fibonacci.asm?raw";
@@ -40,6 +41,10 @@ const editor = new Editor(document.getElementById("editor-root"), {
     } else {
       activeBreakpoints.add(addr);
       controller.addBreakpoint(addr);
+      toast.show(
+        "breakpoint-set",
+        "ブレークポイントを設定しました。「Run」を押すと、この行の直前で自動的に止まります。",
+      );
     }
   },
 });
@@ -48,6 +53,7 @@ const animationEngine = new AnimationEngine();
 const busTokenAnimator = new BusTokenAnimator(diagramRenderer, animationEngine);
 const statsPanel = new StatsPanel(document.getElementById("stats-root"));
 const statsCollector = new StatsCollector();
+const toast = new ToastBar(document.getElementById("toast-root"));
 
 const machineCodeEl = document.getElementById("machine-code");
 const explainTextEl = document.getElementById("explain-text");
@@ -94,6 +100,10 @@ function handleTick(events) {
     const description = explain(event);
     if (description) explainTextEl.textContent = description;
     if (event.phase) setPipelinePhase(event.phase);
+
+    if (event.type === "halt") {
+      toast.show("first-halt", "プログラムの実行が完了しました。「Reset」を押すと最初からやり直せます。");
+    }
   }
   refreshStaticViews();
   statsPanel.update(statsCollector.snapshot(cpu.clockCount));
@@ -203,14 +213,40 @@ statsPanel.update(statsCollector.snapshot(cpu.clockCount));
 runOnboarding();
 
 function runOnboarding() {
+  // Each step highlights the real panel it talks about (a glowing ring +
+  // page dimmed elsewhere via CSS box-shadow) instead of describing UI
+  // abstractly in a floating modal, so the explanation and the actual
+  // element stay visually connected. On mobile, switching to a step also
+  // switches to that panel's tab so it's actually visible.
   const STEPS = [
-    { title: "CPUに命令を書いてみよう", body: "ここにアセンブリを書きます。最初は用意されたサンプルを選ぶだけでも、CPUの動きを試せます。" },
-    { title: "1クロックずつ進めよう", body: "まずは「1クロック」を押してみましょう。命令が小さな処理に分かれて、少しずつ実行されます。" },
-    { title: "値が移動する道を見よう", body: "光っている線は、いま値が通っている場所です。どこからどこへ運ばれるかを追ってみましょう。" },
-    { title: "CPUの小さな記憶場所", body: "レジスタは、計算中の値を一時的に覚える場所です。書き換わった値に注目してみましょう。" },
-    { title: "プログラムとデータの置き場所", body: "RAMには命令とデータが入っています。実行中に読み書きされた場所が変化する様子を確認できます。" },
+    {
+      title: "CPUに命令を書いてみよう",
+      body: "ここにアセンブリを書きます。最初は用意されたサンプルを選ぶだけでも、CPUの動きを試せます。",
+      target: "panel-code",
+    },
+    {
+      title: "1クロックずつ進めよう",
+      body: "まずは「1クロック」を押してみましょう。命令はFETCH→DECODE→EXECUTEという小さな段階に分かれて、少しずつ実行されます。",
+      target: "debugger-controls",
+    },
+    {
+      title: "値が移動する道を見よう",
+      body: "光っている線は、いま値が通っている場所です。PCやMARなど略語にマウスを乗せると、それぞれの役割の説明が出ます。",
+      target: "panel-diagram",
+    },
+    {
+      title: "CPUの小さな記憶場所",
+      body: "レジスタは、計算中の値を一時的に覚える場所です。BIN(2進数)/DEC(10進数)/HEX(16進数)の見出しにマウスを乗せると読み方の説明が出ます。",
+      target: "panel-registers",
+    },
+    {
+      title: "プログラムとデータの置き場所",
+      body: "RAMには命令とデータが入っています。実行中に読み書きされた場所が水色にハイライトされます。",
+      target: "panel-ram",
+    },
   ];
   let step = 0;
+  let highlightedEl = null;
   try {
     if (localStorage.getItem("pixelcpu-onboarding-done") === "1") return;
   } catch {
@@ -223,13 +259,30 @@ function runOnboarding() {
   const nextBtn = document.getElementById("onboarding-next");
   const skipBtn = document.getElementById("onboarding-skip");
 
+  function clearHighlight() {
+    if (highlightedEl) highlightedEl.classList.remove("onboarding-highlight");
+    highlightedEl = null;
+  }
+
   function render() {
-    titleEl.textContent = STEPS[step].title;
-    bodyEl.textContent = STEPS[step].body;
+    const current = STEPS[step];
+    titleEl.textContent = current.title;
+    bodyEl.textContent = current.body;
     nextBtn.textContent = step === STEPS.length - 1 ? "はじめる" : "次へ";
+
+    clearHighlight();
+    const tabBtn = document.querySelector(`.mobile-tab[data-target="${current.target}"]`);
+    if (tabBtn) tabBtn.click();
+    const targetEl = document.getElementById(current.target);
+    if (targetEl) {
+      targetEl.classList.add("onboarding-highlight");
+      highlightedEl = targetEl;
+      targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }
 
   function finish() {
+    clearHighlight();
     overlay.hidden = true;
     try {
       localStorage.setItem("pixelcpu-onboarding-done", "1");
