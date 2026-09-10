@@ -9,6 +9,8 @@ import { RegisterViewer } from "./ui/panels/registerViewer.js";
 import { RamViewer } from "./ui/panels/ramViewer.js";
 import { Editor } from "./ui/panels/editor.js";
 import { explain } from "./ui/panels/explain.js";
+import { StatsPanel } from "./ui/panels/statsPanel.js";
+import { StatsCollector } from "./simulator/statsCollector.js";
 
 import sample1 from "./samples/01-sum-1-to-10.asm?raw";
 import sample2 from "./samples/02-fibonacci.asm?raw";
@@ -44,6 +46,8 @@ const editor = new Editor(document.getElementById("editor-root"), {
 const diagramRenderer = new CpuDiagramRenderer(document.getElementById("cpu-diagram"));
 const animationEngine = new AnimationEngine();
 const busTokenAnimator = new BusTokenAnimator(diagramRenderer, animationEngine);
+const statsPanel = new StatsPanel(document.getElementById("stats-root"));
+const statsCollector = new StatsCollector();
 
 const machineCodeEl = document.getElementById("machine-code");
 const explainTextEl = document.getElementById("explain-text");
@@ -76,6 +80,7 @@ function refreshStaticViews() {
 function handleTick(events) {
   for (const event of events) {
     busTokenAnimator.handleEvent(event);
+    statsCollector.handleEvent(event);
 
     if (event.type === "bus-transfer" && event.bus === "address" && event.to === "MAR") {
       lastTouchedRamAddr = event.value;
@@ -91,6 +96,7 @@ function handleTick(events) {
     if (event.phase) setPipelinePhase(event.phase);
   }
   refreshStaticViews();
+  statsPanel.update(statsCollector.snapshot(cpu.clockCount));
 }
 
 const controller = new ClockController(cpu, { onTick: handleTick });
@@ -102,6 +108,7 @@ function loadProgram(source) {
     controller.reset();
     controller.clearBreakpoints();
     activeBreakpoints.clear();
+    statsCollector.reset();
     cpu.loadProgram(bytes);
     currentSourceMap = sourceMap;
     lastTouchedRamAddr = null;
@@ -111,6 +118,7 @@ function loadProgram(source) {
     explainTextEl.textContent = "ロードしました。「1クロック」または「1命令」で実行してみましょう。";
     setPipelinePhase("FETCH");
     refreshStaticViews();
+    statsPanel.update(statsCollector.snapshot(cpu.clockCount));
   } catch (err) {
     if (err instanceof AssemblerError) {
       editor.showError(`${err.line}行目: ${err.message}`);
@@ -146,9 +154,11 @@ document.getElementById("btn-step-instr").addEventListener("click", () => contro
 document.getElementById("btn-reset").addEventListener("click", () => {
   controller.reset();
   lastTouchedRamAddr = null;
+  statsCollector.reset();
   setPipelinePhase("FETCH");
   explainTextEl.textContent = "リセットしました。";
   refreshStaticViews();
+  statsPanel.update(statsCollector.snapshot(cpu.clockCount));
   if (currentSourceMap) editor.highlightAddress(0);
 });
 document.getElementById("speed").addEventListener("input", (e) => {
@@ -173,7 +183,7 @@ sampleSelect.addEventListener("change", () => {
 // Mobile tab switching (panel-code is the default active tab, matching the
 // mobile-tab--active button already marked in index.html).
 const tabButtons = document.querySelectorAll(".mobile-tab");
-const panels = ["panel-code", "panel-diagram", "panel-registers", "panel-ram"];
+const panels = ["panel-code", "panel-diagram", "panel-registers", "panel-ram", "panel-stats"];
 document.getElementById("panel-code").classList.add("panel--mobile-active");
 for (const btn of tabButtons) {
   btn.addEventListener("click", () => {
@@ -188,6 +198,7 @@ for (const btn of tabButtons) {
 
 editor.setValue(SAMPLES[0].src);
 refreshStaticViews();
+statsPanel.update(statsCollector.snapshot(cpu.clockCount));
 
 runOnboarding();
 
