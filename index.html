@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PixelCPU - 8bit CPU クロック単位可視化シミュレータ</title>
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <h1>PixelCPU</h1>
+        <div class="pipeline-indicator" id="pipeline-indicator">
+          <span class="pipeline-stage" data-phase="FETCH">FETCH</span>
+          <span class="pipeline-stage" data-phase="DECODE">DECODE</span>
+          <span class="pipeline-stage" data-phase="EXECUTE">EXECUTE</span>
+        </div>
+        <div class="debugger-controls">
+          <button id="btn-run" type="button">▶ Run</button>
+          <button id="btn-pause" type="button">⏸ Pause</button>
+          <button id="btn-step-clock" type="button">1クロック</button>
+          <button id="btn-step-instr" type="button">1命令</button>
+          <button id="btn-reset" type="button">Reset</button>
+          <label class="speed-control">
+            速度
+            <input id="speed" type="range" min="30" max="800" step="10" value="200" />
+          </label>
+          <span class="clock-count">CLOCK #<span id="clock-count">0</span></span>
+        </div>
+      </header>
+
+      <nav class="mobile-tabs" id="mobile-tabs">
+        <button data-target="panel-code" class="mobile-tab mobile-tab--active" type="button">CODE</button>
+        <button data-target="panel-diagram" class="mobile-tab" type="button">DIAGRAM</button>
+        <button data-target="panel-registers" class="mobile-tab" type="button">REG</button>
+        <button data-target="panel-ram" class="mobile-tab" type="button">RAM</button>
+      </nav>
+
+      <main class="layout">
+        <section class="panel" id="panel-code">
+          <div class="panel-header">
+            CODE
+            <select id="sample-select">
+              <option value="">-- サンプルを選択 --</option>
+            </select>
+            <button id="btn-assemble" type="button">アセンブル&amp;ロード</button>
+          </div>
+          <div id="editor-root" class="editor-root"></div>
+          <div class="panel-subheader">MACHINE CODE</div>
+          <pre id="machine-code" class="machine-code"></pre>
+        </section>
+
+        <section class="panel" id="panel-diagram">
+          <div class="panel-header">CPU DIAGRAM</div>
+          <svg id="cpu-diagram" class="cpu-diagram"></svg>
+          <div id="explain-text" class="explain-text">プログラムをロードして「1クロック」を押してください。</div>
+        </section>
+
+        <section class="panel" id="panel-registers">
+          <div class="panel-header">REGISTERS</div>
+          <div id="register-root"></div>
+        </section>
+
+        <section class="panel" id="panel-ram">
+          <div class="panel-header">RAM (256 byte)</div>
+          <div id="ram-root"></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="onboarding" class="onboarding" hidden>
+      <div class="onboarding-card">
+        <h2 id="onboarding-title"></h2>
+        <p id="onboarding-body"></p>
+        <div class="onboarding-actions">
+          <button id="onboarding-skip" type="button">スキップ</button>
+          <button id="onboarding-next" type="button">次へ</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
