@@ -168,6 +168,12 @@ body {
   font-size: 0.75rem;
 }
 
+.editor-hint {
+  padding: 2px 10px;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+}
+
 .panel-subheader {
   padding: 6px 10px 2px;
   font-size: 0.7rem;
@@ -218,6 +224,32 @@ body {
 .code-line--active {
   background: rgba(62, 230, 198, 0.18);
   color: var(--accent-bright);
+}
+
+.code-line--breakpointable {
+  cursor: pointer;
+  position: relative;
+  padding-left: 14px;
+}
+.code-line--breakpointable:hover {
+  background: rgba(255, 180, 84, 0.1);
+}
+.code-line--breakpoint::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--danger);
+}
+.code-line--breakpoint {
+  color: var(--danger);
+}
+.code-line--breakpoint.code-line--active {
+  background: rgba(255, 107, 107, 0.22);
 }
 
 .code-error {

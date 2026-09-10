@@ -29,7 +29,18 @@ const SAMPLES = [
 const cpu = new CPU();
 const registerViewer = new RegisterViewer(document.getElementById("register-root"));
 const ramViewer = new RamViewer(document.getElementById("ram-root"));
-const editor = new Editor(document.getElementById("editor-root"));
+const activeBreakpoints = new Set();
+const editor = new Editor(document.getElementById("editor-root"), {
+  onToggleBreakpoint: (addr) => {
+    if (activeBreakpoints.has(addr)) {
+      activeBreakpoints.delete(addr);
+      controller.removeBreakpoint(addr);
+    } else {
+      activeBreakpoints.add(addr);
+      controller.addBreakpoint(addr);
+    }
+  },
+});
 const diagramRenderer = new CpuDiagramRenderer(document.getElementById("cpu-diagram"));
 const animationEngine = new AnimationEngine();
 const busTokenAnimator = new BusTokenAnimator(diagramRenderer, animationEngine);
@@ -89,6 +100,8 @@ function loadProgram(source) {
   try {
     const { bytes, sourceMap } = assemble(source);
     controller.reset();
+    controller.clearBreakpoints();
+    activeBreakpoints.clear();
     cpu.loadProgram(bytes);
     currentSourceMap = sourceMap;
     lastTouchedRamAddr = null;

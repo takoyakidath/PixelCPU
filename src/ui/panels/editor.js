@@ -1,13 +1,16 @@
 /**
  * Code panel: an editable textarea while writing assembly, and a
- * read-only line list (with the current-PC line highlighted) once a
- * program has been assembled and is running.
+ * read-only line list (with the current-PC line highlighted, and
+ * click-to-toggle breakpoints) once a program has been assembled and is
+ * running.
  */
 export class Editor {
-  constructor(root) {
+  constructor(root, { onToggleBreakpoint } = {}) {
     this.root = root;
     this._lineEls = {};
     this._addrToLine = null;
+    this._lineToAddr = null;
+    this._onToggleBreakpoint = onToggleBreakpoint || (() => {});
     this._render();
   }
 
@@ -49,17 +52,28 @@ export class Editor {
   }
 
   /** Switches to a read-only rendering of `source`, using sourceMap to know
-   * which source line each instruction address belongs to. */
+   * which source line each instruction address belongs to. Lines that
+   * start an instruction are clickable to toggle a breakpoint there. */
   showSourceMap(source, sourceMap) {
     const lines = source.split("\n");
     this.lineView.textContent = "";
     this._lineEls = {};
+    this._lineToAddr = new Map(sourceMap.map((entry) => [entry.line, entry.address]));
     lines.forEach((text, idx) => {
+      const lineNo = idx + 1;
       const div = document.createElement("div");
       div.className = "code-line";
-      div.textContent = text.length > 0 ? text : " ";
+      div.textContent = text.length > 0 ? text : " ";
+      if (this._lineToAddr.has(lineNo)) {
+        div.classList.add("code-line--breakpointable");
+        div.title = "クリックでブレークポイントを設定/解除";
+        div.addEventListener("click", () => {
+          div.classList.toggle("code-line--breakpoint");
+          this._onToggleBreakpoint(this._lineToAddr.get(lineNo));
+        });
+      }
       this.lineView.appendChild(div);
-      this._lineEls[idx + 1] = div;
+      this._lineEls[lineNo] = div;
     });
     this._addrToLine = new Map(sourceMap.map((entry) => [entry.address, entry.line]));
     this.textarea.hidden = true;
@@ -78,5 +92,6 @@ export class Editor {
     this.textarea.hidden = false;
     this.lineView.hidden = true;
     this._addrToLine = null;
+    this._lineToAddr = null;
   }
 }
