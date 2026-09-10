@@ -83,12 +83,31 @@ loop:                  ; ラベルは単独行、識別子+コロン
 対象読者は「CPUを初めて触る人」です。専門用語(バス、ALU、フラグ等)は使ってよいですが、1文で「今何が起きたか」が
 わかる優しい言い回しにしてください。
 
+## 固定仕様4: 統計パネル(pillar 2、時間が余れば実装)の集計項目
+
+まだ実装するか未定ですが、先にラベル文言だけ用意してもらえると助かります。集計はイベントストリームから
+以下のフィールド名で行う想定です(実装は私がやります。文言だけお願いします)。
+
+- `totalClocks` (実行した総クロック数)
+- `totalInstructions` (実行した総命令数)
+- `busTransferCount` (bus-transferイベントの総数)
+- `busTransferBits` (bus-transferイベントのwidth合計、つまり流れた総bit数)
+- `aluOpCount` (alu-opイベントの総数)
+- `stackOpCount` (stack-opイベントの総数)
+- `perInstructionBreakdown` (mnemonicごとの実行回数、例: `{mnemonic: "ADD", count: 3}`)
+
+これらのラベル文言(パネルに表示する日本語の見出し・説明文)を `docs/codex-drafts/stats-panel-copy.md` に書いてください。
+
 ## 今後追加するタスク(随時追記)
 
-- [ ] サンプルプログラム6本 (`src/samples/*.asm`)
-- [ ] explain.js テンプレート文言 (`docs/codex-drafts/explain-templates.md`)
-- [ ] README.md ドラフト
-- [ ] vercel.json
+- [x] サンプルプログラム6本 (`src/samples/*.asm`)
+- [x] explain.js テンプレート文言 (`docs/codex-drafts/explain-templates.md`)
+- [x] README.md ドラフト
+- [x] vercel.json
+- [ ] `LICENSE` ファイル(MITライセンス推奨。ヘッダーはコピーライト年2026、名義は takoyakidath でお願いします)
+- [ ] 初回起動時オンボーディングの文言ドラフト(数ステップの案内。「これがレジスタです」的な短い説明を4〜6ステップ程度、`docs/codex-drafts/onboarding-copy.md` に。対象はCPU初心者。まだUI実装前なので、対象要素は「回路図」「レジスタビューア」「RAMビューア」「Debuggerボタン」「コードエディタ」のような抽象的な単位で書いてOK、具体的なDOM要素との紐付けは私がやります)
+- [ ] §固定仕様4の統計パネル文言ドラフト (`docs/codex-drafts/stats-panel-copy.md`)
+- [ ] コンテスト提出前チェックリストのドラフト(`docs/codex-drafts/submission-checklist.md` に。例: 公開リポジトリになっているか、README のスクリーンショットTODOが埋まっているか、デプロイURLがPC/スマホ両方のChromeで動くか、ライセンスファイルがあるか、など。ZEN Studyコンテストの提出要件を思い出しながら書いてください)
 - [ ] (追加予定があればここに追記していきます)
 
 ## 連携の進め方
