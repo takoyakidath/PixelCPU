@@ -104,10 +104,10 @@ loop:                  ; ラベルは単独行、識別子+コロン
 - [x] explain.js テンプレート文言 (`docs/codex-drafts/explain-templates.md`)
 - [x] README.md ドラフト
 - [x] vercel.json
-- [ ] `LICENSE` ファイル(MITライセンス推奨。ヘッダーはコピーライト年2026、名義は takoyakidath でお願いします)
-- [ ] 初回起動時オンボーディングの文言ドラフト(数ステップの案内。「これがレジスタです」的な短い説明を4〜6ステップ程度、`docs/codex-drafts/onboarding-copy.md` に。対象はCPU初心者。まだUI実装前なので、対象要素は「回路図」「レジスタビューア」「RAMビューア」「Debuggerボタン」「コードエディタ」のような抽象的な単位で書いてOK、具体的なDOM要素との紐付けは私がやります)
-- [ ] §固定仕様4の統計パネル文言ドラフト (`docs/codex-drafts/stats-panel-copy.md`)
-- [ ] コンテスト提出前チェックリストのドラフト(`docs/codex-drafts/submission-checklist.md` に。例: 公開リポジトリになっているか、README のスクリーンショットTODOが埋まっているか、デプロイURLがPC/スマホ両方のChromeで動くか、ライセンスファイルがあるか、など。ZEN Studyコンテストの提出要件を思い出しながら書いてください)
+- [x] `LICENSE` ファイル(MITライセンス推奨。ヘッダーはコピーライト年2026、名義は takoyakidath でお願いします)
+- [x] 初回起動時オンボーディングの文言ドラフト(数ステップの案内。「これがレジスタです」的な短い説明を4〜6ステップ程度、`docs/codex-drafts/onboarding-copy.md` に。対象はCPU初心者。まだUI実装前なので、対象要素は「回路図」「レジスタビューア」「RAMビューア」「Debuggerボタン」「コードエディタ」のような抽象的な単位で書いてOK、具体的なDOM要素との紐付けは私がやります)
+- [x] §固定仕様4の統計パネル文言ドラフト (`docs/codex-drafts/stats-panel-copy.md`)
+- [x] コンテスト提出前チェックリストのドラフト(`docs/codex-drafts/submission-checklist.md` に。例: 公開リポジトリになっているか、README のスクリーンショットTODOが埋まっているか、デプロイURLがPC/スマホ両方のChromeで動くか、ライセンスファイルがあるか、など。ZEN Studyコンテストの提出要件を思い出しながら書いてください)
 - [ ] (追加予定があればここに追記していきます)
 
 ## 連携の進め方
