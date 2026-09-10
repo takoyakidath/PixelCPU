@@ -1,10 +1,12 @@
 # PixelCPU
 
+**公開URL: https://pixelcpu.vercel.app**
+
 PixelCPUは、8bit CPUの中でデータが動く様子を、1クロックずつ目で追えるブラウザ上のCPUエミュレータです。アセンブリを書くと、命令の実行位置、レジスタやRAMの変化、バスを流れる値、ALUの計算が連動して表示されます。
 
 CPUに初めて触れる人が、命令の結果だけでなく「今、内部で何が起きたのか」を直感的に理解できることを目指しています。ZEN Study「動くWebページコンテスト」応募作品です。
 
-<!-- TODO screenshot -->
+![PixelCPU screenshot](./docs/images/screenshot.jpg)
 
 ## 特徴
 
