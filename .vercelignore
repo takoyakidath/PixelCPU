@@ -1,0 +1,6 @@
+tests
+docs
+scripts
+package.json
+package-lock.json
+vitest.config.js

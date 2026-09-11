@@ -14,27 +14,37 @@ import { StatsCollector } from "./simulator/statsCollector.js";
 import { ToastBar } from "./ui/panels/toast.js";
 import { ArrayView } from "./ui/panels/arrayView.js";
 
-import sample1 from "./samples/01-sum-1-to-10.asm?raw";
-import sample2 from "./samples/02-fibonacci.asm?raw";
-import sample3 from "./samples/03-multiply-by-add.asm?raw";
-import sample4 from "./samples/04-memcpy.asm?raw";
-import sample5 from "./samples/05-stack-subroutine.asm?raw";
-import sample6 from "./samples/06-bubble-sort.asm?raw";
+import {
+  SAMPLE_SUM_1_TO_10,
+  SAMPLE_FIBONACCI,
+  SAMPLE_MULTIPLY_BY_ADD,
+  SAMPLE_MEMCPY,
+  SAMPLE_STACK_SUBROUTINE,
+  SAMPLE_BUBBLE_SORT,
+} from "./samples/index.js";
 
 const SAMPLES = [
-  { label: "1〜10までの合計", src: sample1 },
-  { label: "フィボナッチ数列", src: sample2, watches: [{ start: 0xe0, length: 10, label: "フィボナッチ数列 (0xE0〜0xE9)" }] },
-  { label: "掛け算(ADDの繰り返し)", src: sample3 },
+  { label: "1〜10までの合計", src: SAMPLE_SUM_1_TO_10 },
+  {
+    label: "フィボナッチ数列",
+    src: SAMPLE_FIBONACCI,
+    watches: [{ start: 0xe0, length: 10, label: "フィボナッチ数列 (0xE0〜0xE9)" }],
+  },
+  { label: "掛け算(ADDの繰り返し)", src: SAMPLE_MULTIPLY_BY_ADD },
   {
     label: "メモリコピー",
-    src: sample4,
+    src: SAMPLE_MEMCPY,
     watches: [
       { start: 0xe0, length: 4, label: "コピー元 (0xE0〜0xE3)" },
       { start: 0xf0, length: 4, label: "コピー先 (0xF0〜0xF3)" },
     ],
   },
-  { label: "CALL/RETサブルーチン", src: sample5 },
-  { label: "バブルソート", src: sample6, watches: [{ start: 0xf0, length: 5, label: "ソート対象の配列 (0xF0〜0xF4)" }] },
+  { label: "CALL/RETサブルーチン", src: SAMPLE_STACK_SUBROUTINE },
+  {
+    label: "バブルソート",
+    src: SAMPLE_BUBBLE_SORT,
+    watches: [{ start: 0xf0, length: 5, label: "ソート対象の配列 (0xF0〜0xF4)" }],
+  },
 ];
 
 const cpu = new CPU();
