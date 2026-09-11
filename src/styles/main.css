@@ -654,25 +654,49 @@ body {
 @media (max-width: 900px) {
   .mobile-tabs {
     display: flex;
-    gap: 6px;
-    padding: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 8px;
     background: var(--panel-bg);
     border-bottom: 1px solid var(--panel-border);
-    overflow-x: auto;
+  }
+  .mobile-tabs-hint {
+    flex-basis: 100%;
+    font-size: 0.72rem;
+    color: var(--accent-bright);
   }
   .mobile-tab {
     background: #182231;
-    color: var(--text-dim);
+    color: var(--text);
     border: 1px solid var(--panel-border);
     border-radius: 999px;
-    padding: 6px 14px;
-    font-size: 0.75rem;
+    padding: 9px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
     white-space: nowrap;
   }
   .mobile-tab--active {
     background: var(--accent);
     color: #04241f;
     border-color: var(--accent);
+  }
+  /* Draws the eye to the tab bar right after load, since a first-time
+     visitor otherwise sees only the CODE panel and may not realize the
+     diagram/registers/RAM live behind these tabs (a real gap a user hit:
+     they didn't notice the tabs existed at all). Settles after a few
+     pulses so it doesn't nag. */
+  .mobile-tabs--attention .mobile-tab:not(.mobile-tab--active) {
+    animation: tabAttentionPulse 1.6s ease-in-out 3;
+  }
+  @keyframes tabAttentionPulse {
+    0%,
+    100% {
+      box-shadow: none;
+    }
+    50% {
+      box-shadow: 0 0 0 2px var(--accent-warm);
+    }
   }
 
   .layout {

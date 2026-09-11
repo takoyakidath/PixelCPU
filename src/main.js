@@ -221,6 +221,7 @@ editor.textarea.addEventListener("input", () => {
 // Mobile tab switching (panel-code is the default active tab, matching the
 // mobile-tab--active button already marked in index.html).
 const tabButtons = document.querySelectorAll(".mobile-tab");
+const mobileTabsNav = document.getElementById("mobile-tabs");
 const panels = ["panel-code", "panel-diagram", "panel-registers", "panel-ram", "panel-stats"];
 document.getElementById("panel-code").classList.add("panel--mobile-active");
 for (const btn of tabButtons) {
@@ -231,7 +232,22 @@ for (const btn of tabButtons) {
     for (const id of panels) {
       document.getElementById(id).classList.toggle("panel--mobile-active", id === target);
     }
+    mobileTabsNav.classList.remove("mobile-tabs--attention");
   });
+}
+
+// A real user hit this: on a phone they only ever saw the CODE panel and
+// never realized the diagram/registers/RAM live behind the tab bar above
+// it. Draw attention to it once on narrow viewports, and say so in words
+// too (an animation alone can be missed or dismissed as decorative).
+if (window.matchMedia("(max-width: 900px)").matches) {
+  mobileTabsNav.classList.add("mobile-tabs--attention");
+  setTimeout(() => mobileTabsNav.classList.remove("mobile-tabs--attention"), 6000);
+  toast.show(
+    "mobile-tabs-hint",
+    "上のタブ(コード/回路図/レジスタ/RAM/統計)をタップすると画面が切り替わります。",
+    { duration: 6000 },
+  );
 }
 
 currentSampleIdx = 0;
