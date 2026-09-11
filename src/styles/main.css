@@ -161,6 +161,22 @@ body {
   grid-row: 3;
 }
 
+/* Each of these is the scrollable content area of a panel that shares the
+   right column with two others. Without flex:1 + min-height:0, a child
+   only takes its natural content height instead of being bounded by the
+   panel's actual available space, so overflow-y:auto on the grandchild
+   (.ram-grid, .stats-root's own children) never actually engages - the
+   content just gets clipped by the panel's own overflow:hidden instead of
+   scrolling (the exact bug reported for the RAM panel: only the first
+   handful of the 256 bytes were visible, with no way to scroll to the
+   rest). Mirrors the same fix already applied to .editor-root/.code-lineview. */
+#register-root,
+#ram-root {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .panel {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
@@ -488,6 +504,7 @@ body {
 }
 
 .stats-root {
+  flex: 1;
   padding: 8px 10px;
   overflow-y: auto;
   min-height: 0;
