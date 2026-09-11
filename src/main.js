@@ -281,7 +281,7 @@ function runOnboarding() {
     }
   }
 
-  function finish() {
+  function finish(withDemo) {
     clearHighlight();
     overlay.hidden = true;
     try {
@@ -289,17 +289,26 @@ function runOnboarding() {
     } catch {
       // ignore
     }
+    // Bridge "reading about it" to "seeing it move": completing the full
+    // walkthrough loads the sample already in the editor and advances one
+    // real clock tick, so the very first thing the user sees afterward is
+    // an actual bus-transfer animation, not an empty diagram.
+    if (withDemo) {
+      loadProgram(editor.getValue());
+      controller.tick();
+      toast.show("onboarding-demo", "これが最初の1クロックです。「1クロック」を押すと続きを進められます。");
+    }
   }
 
   nextBtn.addEventListener("click", () => {
     step++;
     if (step >= STEPS.length) {
-      finish();
+      finish(true);
       return;
     }
     render();
   });
-  skipBtn.addEventListener("click", finish);
+  skipBtn.addEventListener("click", () => finish(false));
 
   overlay.hidden = false;
   render();
