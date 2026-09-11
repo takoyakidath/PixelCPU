@@ -509,7 +509,13 @@ body {
 }
 .onboarding-highlight {
   position: relative;
-  z-index: 51;
+  /* Must stay below .onboarding's z-index (50): this lives in the normal
+     page stacking context (not inside the overlay), so if it ever
+     out-ranked the overlay, the highlighted element's own content (e.g.
+     the SVG diagram) would paint over the onboarding card sitting inside
+     the overlay's stacking context, hiding it entirely. Low enough to
+     stay under the overlay, high enough to sit above sibling panels. */
+  z-index: 10;
   box-shadow:
     0 0 0 3px var(--accent),
     0 0 24px 4px rgba(62, 230, 198, 0.5),
