@@ -55,6 +55,20 @@ body {
   letter-spacing: 0.04em;
 }
 
+.tutorial-btn {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.tutorial-btn:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent);
+}
+
 .pipeline-indicator {
   display: flex;
   gap: 6px;

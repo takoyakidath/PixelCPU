@@ -229,9 +229,9 @@ editor.setValue(SAMPLES[0].src);
 refreshStaticViews();
 statsPanel.update(statsCollector.snapshot(cpu.clockCount));
 
-runOnboarding();
+setupOnboarding();
 
-function runOnboarding() {
+function setupOnboarding() {
   // Each step highlights the real panel it talks about (a glowing ring +
   // page dimmed elsewhere via CSS box-shadow) instead of describing UI
   // abstractly in a floating modal, so the explanation and the actual
@@ -266,17 +266,13 @@ function runOnboarding() {
   ];
   let step = 0;
   let highlightedEl = null;
-  try {
-    if (localStorage.getItem("pixelcpu-onboarding-done") === "1") return;
-  } catch {
-    // localStorage unavailable (private mode etc.) - just show onboarding every time.
-  }
 
   const overlay = document.getElementById("onboarding");
   const titleEl = document.getElementById("onboarding-title");
   const bodyEl = document.getElementById("onboarding-body");
   const nextBtn = document.getElementById("onboarding-next");
   const skipBtn = document.getElementById("onboarding-skip");
+  const tutorialBtn = document.getElementById("btn-tutorial");
 
   function clearHighlight() {
     if (highlightedEl) highlightedEl.classList.remove("onboarding-highlight");
@@ -319,6 +315,13 @@ function runOnboarding() {
     }
   }
 
+  function start() {
+    if (!overlay.hidden) return; // already showing, ignore repeat triggers
+    step = 0;
+    overlay.hidden = false;
+    render();
+  }
+
   nextBtn.addEventListener("click", () => {
     step++;
     if (step >= STEPS.length) {
@@ -328,7 +331,12 @@ function runOnboarding() {
     render();
   });
   skipBtn.addEventListener("click", () => finish(false));
+  tutorialBtn.addEventListener("click", start);
 
-  overlay.hidden = false;
-  render();
+  try {
+    if (localStorage.getItem("pixelcpu-onboarding-done") !== "1") start();
+  } catch {
+    // localStorage unavailable (private mode etc.) - just show it every load.
+    start();
+  }
 }
