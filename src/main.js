@@ -12,6 +12,7 @@ import { explain } from "./ui/panels/explain.js";
 import { StatsPanel } from "./ui/panels/statsPanel.js";
 import { StatsCollector } from "./simulator/statsCollector.js";
 import { ToastBar } from "./ui/panels/toast.js";
+import { ArrayView } from "./ui/panels/arrayView.js";
 
 import sample1 from "./samples/01-sum-1-to-10.asm?raw";
 import sample2 from "./samples/02-fibonacci.asm?raw";
@@ -22,11 +23,18 @@ import sample6 from "./samples/06-bubble-sort.asm?raw";
 
 const SAMPLES = [
   { label: "1〜10までの合計", src: sample1 },
-  { label: "フィボナッチ数列", src: sample2 },
+  { label: "フィボナッチ数列", src: sample2, watches: [{ start: 0xe0, length: 10, label: "フィボナッチ数列 (0xE0〜0xE9)" }] },
   { label: "掛け算(ADDの繰り返し)", src: sample3 },
-  { label: "メモリコピー", src: sample4 },
+  {
+    label: "メモリコピー",
+    src: sample4,
+    watches: [
+      { start: 0xe0, length: 4, label: "コピー元 (0xE0〜0xE3)" },
+      { start: 0xf0, length: 4, label: "コピー先 (0xF0〜0xF3)" },
+    ],
+  },
   { label: "CALL/RETサブルーチン", src: sample5 },
-  { label: "バブルソート", src: sample6 },
+  { label: "バブルソート", src: sample6, watches: [{ start: 0xf0, length: 5, label: "ソート対象の配列 (0xF0〜0xF4)" }] },
 ];
 
 const cpu = new CPU();
@@ -54,6 +62,7 @@ const busTokenAnimator = new BusTokenAnimator(diagramRenderer, animationEngine);
 const statsPanel = new StatsPanel(document.getElementById("stats-root"));
 const statsCollector = new StatsCollector();
 const toast = new ToastBar(document.getElementById("toast-root"));
+const arrayView = new ArrayView(document.getElementById("array-view-root"));
 
 const machineCodeEl = document.getElementById("machine-code");
 const explainTextEl = document.getElementById("explain-text");
@@ -63,6 +72,7 @@ const sampleSelect = document.getElementById("sample-select");
 
 let currentSourceMap = null;
 let lastTouchedRamAddr = null;
+let currentSampleIdx = null;
 
 function setPipelinePhase(phase) {
   for (const stage of pipelineStages) {
@@ -81,6 +91,7 @@ function refreshStaticViews() {
   diagramRenderer.setValue("MAR", `0x${state.registers.MAR.toString(16).padStart(2, "0")}`);
   diagramRenderer.setValue("FLAGS", `Z${state.flags.Z} C${state.flags.C} N${state.flags.N}`);
   clockCountEl.textContent = String(state.clockCount);
+  arrayView.update(state.ram, lastTouchedRamAddr);
 }
 
 function handleTick(events) {
@@ -124,6 +135,7 @@ function loadProgram(source) {
     lastTouchedRamAddr = null;
     editor.showSourceMap(source, sourceMap);
     editor.highlightAddress(0);
+    arrayView.setWatches(currentSampleIdx !== null ? SAMPLES[currentSampleIdx].watches : undefined);
     machineCodeEl.textContent = formatMachineCode(bytes, sourceMap);
     explainTextEl.textContent = "ロードしました。「1クロック」または「1命令」で実行してみましょう。";
     setPipelinePhase("FETCH");
@@ -187,7 +199,13 @@ for (const [idx, sample] of SAMPLES.entries()) {
 sampleSelect.addEventListener("change", () => {
   const idx = sampleSelect.value;
   if (idx === "") return;
+  currentSampleIdx = Number(idx);
   editor.setValue(SAMPLES[Number(idx)].src);
+});
+// Any manual keystroke means the loaded text is no longer necessarily the
+// selected sample verbatim, so drop the array-view association with it.
+editor.textarea.addEventListener("input", () => {
+  currentSampleIdx = null;
 });
 
 // Mobile tab switching (panel-code is the default active tab, matching the
@@ -206,6 +224,7 @@ for (const btn of tabButtons) {
   });
 }
 
+currentSampleIdx = 0;
 editor.setValue(SAMPLES[0].src);
 refreshStaticViews();
 statsPanel.update(statsCollector.snapshot(cpu.clockCount));
